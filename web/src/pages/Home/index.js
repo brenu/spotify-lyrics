@@ -1,12 +1,31 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useParams, useLocation } from "react-router-dom";
 
 import api from "../../services/api";
 
 import "./styles.css";
 
+import useQuery from "../../components/query";
+
 export default function Home({ history }) {
   const [isSubmitFailed, setIsSubmitFailed] = useState(false);
   const [message, setMessage] = useState("");
+  const query = useQuery();
+
+  useEffect(() => {
+    async function handleInit() {
+      const code = query.get("code");
+      const state = query.get("state");
+
+      if (code && state) {
+        localStorage.setItem("code", code);
+        localStorage.setItem("state", state);
+        history.push("/dashboard");
+      }
+    }
+
+    handleInit();
+  }, []);
 
   async function handleNavigation() {
     try {
