@@ -47,3 +47,11 @@ h1 {
   font-size: 30pt;
   color: #4bb543;
 }
+
+.error {
+  text-align: justify;
+  font-size: 15pt;
+  font-weight: bold;
+  color: #f55;
+  margin-top: 10px;
+}
