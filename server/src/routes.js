@@ -1,7 +1,5 @@
 const Router = require("express");
 const api = require("axios");
-const btoa = require("btoa");
-const { json } = require("express");
 
 const routes = new Router();
 
@@ -11,7 +9,7 @@ routes.get("/", (req, res) => {
 
 routes.get("/login-url", (req, res) => {
   return res.send(
-    "https://accounts.spotify.com/authorize?client_id=e5e0a3b8cdd6434dadcd232b7e483fbe&response_type=code&redirect_uri=https://spotify-lyrics.netlify.app/&scope=user-read-private%20user-read-email&state=activity"
+    `https://accounts.spotify.com/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=https://spotify-lyrics.netlify.app/&scope=user-read-private%20user-read-email&state=activity`
   );
 });
 
@@ -22,8 +20,8 @@ routes.post("/get-info", async (req, res) => {
   data.append("grant_type", "authorization_code");
   data.append("code", code);
   data.append("redirect_uri", "https://spotify-lyrics.netlify.app/");
-  data.append("client_id", "e5e0a3b8cdd6434dadcd232b7e483fbe");
-  data.append("client_secret", "61b16a1d82034ec6b14e45ddbd72a726");
+  data.append("client_id", process.env.CLIENT_ID);
+  data.append("client_secret", process.env.SECRET_ID);
 
   try {
     const response = await api.post(
@@ -37,7 +35,22 @@ routes.post("/get-info", async (req, res) => {
     );
 
     if (response.status === 200) {
-      console.log(response.data);
+      const data = new URLSearchParams();
+
+      data.append("grant_type", "refresh_token");
+      data.append("refresh_token", response.data.refresh_token);
+
+      const connectionResponse = await api.get(
+        "https://api.spotify.com/v1/me",
+        {
+          headers: {
+            Authorization: "Bearer " + response.data.access_token,
+          },
+        }
+      );
+      if (connectionResponse.status === 200) {
+        console.log(connectionResponse.data);
+      }
     }
   } catch (error) {
     console.log(error);
