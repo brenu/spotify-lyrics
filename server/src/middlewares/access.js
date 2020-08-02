@@ -13,7 +13,7 @@ module.exports = {
 
     try {
       const response = await api.post(
-        "https://accounts.spotify.com/api/token?grant_type=authorization_code",
+        "https://accounts.spotify.com/api/token",
         data,
         {
           headers: {

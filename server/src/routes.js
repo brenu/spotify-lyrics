@@ -12,7 +12,7 @@ routes.get("/", (req, res) => {
 
 routes.get("/login-url", (req, res) => {
   return res.send(
-    `https://accounts.spotify.com/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=https://spotify-lyrics.netlify.app/&scope=user-read-private%20user-read-email&state=activity`
+    `https://accounts.spotify.com/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=https://spotify-lyrics.netlify.app/&scope=user-read-private%20user-read-email%20user-read-currently-playing%20user-read-playback-state&state=activity`
   );
 });
 
@@ -20,6 +20,12 @@ routes.post(
   "/get-info",
   AccessMiddleware.getAccessToken,
   UserController.getUserInfo
+);
+
+routes.post(
+  "/get-song",
+  AccessMiddleware.getAccessToken,
+  UserController.getPlayingSong
 );
 
 module.exports = routes;
