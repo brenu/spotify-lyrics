@@ -27,7 +27,10 @@ export default function Dashboard() {
           );
 
           if (lyricsResponse.status === 200) {
-            let lyrics = lyricsResponse.data.lyrics.split("\n");
+            let lyrics = lyricsResponse.data.lyrics
+              .split("\n\n")
+              .join("\n")
+              .split("\n");
             const lyricsArray = [];
 
             for (let phrase of lyrics) {
