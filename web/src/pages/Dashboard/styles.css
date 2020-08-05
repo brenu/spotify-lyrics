@@ -2,7 +2,8 @@
   height: 100%;
   justify-content: flex-start;
   align-items: center;
-  padding: 50px;
+  padding-top: 50px;
+  padding-bottom: 50px;
 }
 
 #dashboard-content {

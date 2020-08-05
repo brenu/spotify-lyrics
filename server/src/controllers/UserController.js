@@ -37,6 +37,10 @@ module.exports = {
       );
 
       console.log(response.status);
+      if (response.status === 204) {
+        console.log("oi");
+        return res.status(204).json({});
+      }
 
       if (response.status === 200) {
         console.log(response);
