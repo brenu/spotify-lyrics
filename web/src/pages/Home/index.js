@@ -16,6 +16,7 @@ export default function Home({ history }) {
     async function handleInit() {
       const code = query.get("code");
       const state = query.get("state");
+      localStorage.removeItem("refresh_token");
 
       if (code && state) {
         localStorage.setItem("code", code);

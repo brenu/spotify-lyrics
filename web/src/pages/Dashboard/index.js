@@ -14,15 +14,31 @@ export default function Dashboard() {
   const [songFailed, setSongFailed] = useState(false);
   const [songMessage, setSongMessage] = useState("");
 
+  const [counter, setCounter] = useState(0);
+
   useEffect(() => {
     async function handleInit() {
       const code = localStorage.getItem("code");
       const state = localStorage.getItem("state");
+      const refresh_token = localStorage.getItem("refresh_token");
 
       try {
-        const response = await api.post("/get-song", { code, state });
+        if (!refresh_token) {
+          var response = await api.post("/get-song", { code, state });
+          localStorage.setItem("refresh_token", response.data.refresh_token);
+        } else {
+          var response = await api.put("/get-song-refreshed", {
+            refresh_token,
+          });
+          localStorage.setItem("refresh_token", response.data.refresh_token);
+        }
 
-        if (response.status === 200) {
+        if (
+          response.status === 200 &&
+          (songName !== response.data.item.name ||
+            artist !== response.data.item.artists[0].name)
+        ) {
+          setSongFailed(false);
           setSongName(response.data.item.name);
           setArtist(response.data.item.artists[0].name);
           const lyricsResponse = await api.get(
@@ -44,13 +60,16 @@ export default function Dashboard() {
               }
             }
 
+            setLyricsFailed(false);
             setLyrics(lyricsArray);
           } else {
             setLyricsFailed(true);
             setMessage("We couldn't find the lyrics for this song :(");
           }
-        } else if (response.status === 204) {
+        } else if (response.status === 206) {
           setSongFailed(true);
+          setLyricsFailed(true);
+          setMessage("");
           setSongMessage("You are not listening to anything yet!");
         }
       } catch (error) {
@@ -60,7 +79,8 @@ export default function Dashboard() {
     }
 
     handleInit();
-  }, []);
+    setTimeout(() => setCounter((counter) => counter + 1), [5000]);
+  }, [counter]);
 
   return (
     <div className="container" id="dashboard-container">

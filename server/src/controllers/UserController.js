@@ -24,10 +24,10 @@ module.exports = {
   },
 
   async getPlayingSong(req, res) {
-    const { access_token } = res.locals;
+    const { access_token, refresh_token } = res.locals;
 
     try {
-      const response = await api.get(
+      let response = await api.get(
         "https://api.spotify.com/v1/me/player/currently-playing",
         {
           headers: {
@@ -38,12 +38,12 @@ module.exports = {
 
       console.log(response.status);
       if (response.status === 204) {
-        console.log("oi");
-        return res.status(204).json({});
+        return res.status(206).json({ refresh_token });
       }
 
       if (response.status === 200) {
         console.log(response);
+        response.data.refresh_token = refresh_token;
         return res.json(response.data);
       }
     } catch (error) {

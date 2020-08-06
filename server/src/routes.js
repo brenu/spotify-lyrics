@@ -11,8 +11,9 @@ routes.get("/", (req, res) => {
 });
 
 routes.get("/login-url", (req, res) => {
+  console.log(process.env.REDIRECT_URI);
   return res.send(
-    `https://accounts.spotify.com/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=https://spotify-lyrics.netlify.app/&scope=user-read-private%20user-read-email%20user-read-currently-playing%20user-read-playback-state&state=activity`
+    `https://accounts.spotify.com/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=${process.env.REDIRECT_URI}&scope=user-read-private%20user-read-email%20user-read-currently-playing%20user-read-playback-state&state=activity`
   );
 });
 
@@ -25,6 +26,12 @@ routes.post(
 routes.post(
   "/get-song",
   AccessMiddleware.getAccessToken,
+  UserController.getPlayingSong
+);
+
+routes.put(
+  "/get-song-refreshed",
+  AccessMiddleware.getRefreshedToken,
   UserController.getPlayingSong
 );
 
