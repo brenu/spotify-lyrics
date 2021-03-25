@@ -87,7 +87,7 @@ module.exports = {
     const { access_token, refresh_token } = res.locals;
 
     try {
-      const response = await api.put("https://api.spotify.com/v1/me/player/previous",{}, {headers: {"Authorization": `Bearer ${access_token}`}});
+      const response = await api.post("https://api.spotify.com/v1/me/player/previous",{}, {headers: {"Authorization": `Bearer ${access_token}`}});
 
       if(response.status === 204){
         return res.status(206).json({refresh_token});

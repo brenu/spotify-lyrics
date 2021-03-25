@@ -27,11 +27,17 @@ export default function Dashboard() {
         if (!refresh_token) {
           var response = await api.post("/get-song", { code, state });
           localStorage.setItem("refresh_token", response.data.refresh_token);
+          if(response.data.is_playing != undefined){
+            setIsPaused(isPaused => !response.data.is_playing);
+          }
         } else {
           var response = await api.put("/get-song-refreshed", {
             refresh_token,
           });
           localStorage.setItem("refresh_token", response.data.refresh_token);
+          if(response.data.is_playing != undefined){
+            setIsPaused(isPaused => !response.data.is_playing);
+          }
         }
 
         if (
@@ -91,8 +97,18 @@ export default function Dashboard() {
       
       if(isPaused){
         response = await api.put("/play",{refresh_token});
+
+        if(response.status === 206){
+          setIsPaused(isPaused => !isPaused);
+          localStorage.setItem("refresh_token", response.data.refresh_token);
+        }
       }else{
         response = await api.put("/pause",{refresh_token});
+
+        if(response.status === 206){
+          setIsPaused(isPaused => !isPaused);
+          localStorage.setItem("refresh_token", response.data.refresh_token);
+        }
       }
 
       if(response.status === 204){

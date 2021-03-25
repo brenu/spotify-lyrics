@@ -12,7 +12,7 @@ routes.get("/", (req, res) => {
 
 routes.get("/login-url", (req, res) => {
   return res.send(
-    `https://accounts.spotify.com/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=${process.env.REDIRECT_URI}&scope=user-read-private%20user-read-email%20user-read-currently-playing%20user-read-playback-state%20streaming&state=activity`
+    `https://accounts.spotify.com/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=${process.env.REDIRECT_URI}&scope=user-read-private%20user-read-email%20user-read-currently-playing%20user-read-playback-state%20user-modify-playback-state&state=activity`
   );
 });
 
