@@ -59,7 +59,6 @@ module.exports = {
         next();
       }
     } catch (error) {
-      console.log(error);
       return res
         .status(400)
         .json({ message: "Não foi possível realizar a operação" });

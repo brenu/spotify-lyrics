@@ -13,6 +13,7 @@ export default function Dashboard() {
   const [message, setMessage] = useState("");
   const [songFailed, setSongFailed] = useState(false);
   const [songMessage, setSongMessage] = useState("");
+  const [isPaused, setIsPaused] = useState(true);
 
   const [counter, setCounter] = useState(0);
 
@@ -82,8 +83,73 @@ export default function Dashboard() {
     setTimeout(() => setCounter((counter) => counter + 1), [5000]);
   }, [counter]);
 
+  async function handlePlay() {
+    const refresh_token = localStorage.getItem("refresh_token");
+
+    try {
+      let response;
+      
+      if(isPaused){
+        response = await api.put("/play",{refresh_token});
+      }else{
+        response = await api.put("/pause",{refresh_token});
+      }
+
+      if(response.status === 204){
+        setIsPaused(isPaused => !isPaused);
+      }
+    } catch (error) {
+      console.log("Unable to make request");
+    }
+  }
+
+  async function handlePrevious() {
+    const refresh_token = localStorage.getItem("refresh_token");
+
+    try {
+      let response;
+      
+      if(isPaused){
+        response = await api.put("/previous",{refresh_token});
+      }else{
+        response = await api.put("/pause",{refresh_token});
+      }
+
+      if(response.status === 204){
+        setIsPaused(isPaused => !isPaused);
+      }
+    } catch (error) {
+      console.log("Unable to make request");
+    }
+  }
+
+  async function handleNext() {
+    const refresh_token = localStorage.getItem("refresh_token");
+
+    try {
+      let response;
+      
+      if(isPaused){
+        response = await api.put("/next",{refresh_token});
+      }else{
+        response = await api.put("/pause",{refresh_token});
+      }
+
+      if(response.status === 204){
+        setIsPaused(isPaused => !isPaused);
+      }
+    } catch (error) {
+      console.log("Unable to make request");
+    }
+  }
+
   return (
     <div className="container" id="dashboard-container">
+      <div className="buttons-container">
+        <button className="previous-btn" onClick={handlePrevious}>Previous</button>
+        <button className="play-btn" onClick={handlePlay}>{isPaused ? 'Play' : 'Pause'}</button>
+        <button className="next-btn" onClick={handleNext}>Next</button>
+      </div>
       <div className="content" id="dashboard-content">
         <h1>Spotify-Lyrics</h1>
         {!songFailed ? (

@@ -11,9 +11,8 @@ routes.get("/", (req, res) => {
 });
 
 routes.get("/login-url", (req, res) => {
-  console.log(process.env.REDIRECT_URI);
   return res.send(
-    `https://accounts.spotify.com/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=${process.env.REDIRECT_URI}&scope=user-read-private%20user-read-email%20user-read-currently-playing%20user-read-playback-state&state=activity`
+    `https://accounts.spotify.com/authorize?client_id=${process.env.CLIENT_ID}&response_type=code&redirect_uri=${process.env.REDIRECT_URI}&scope=user-read-private%20user-read-email%20user-read-currently-playing%20user-read-playback-state%20streaming&state=activity`
   );
 });
 
@@ -33,6 +32,26 @@ routes.put(
   "/get-song-refreshed",
   AccessMiddleware.getRefreshedToken,
   UserController.getPlayingSong
+);
+
+routes.put("/play",
+  AccessMiddleware.getRefreshedToken,
+  UserController.playSong
+);
+
+routes.put("/pause",
+  AccessMiddleware.getRefreshedToken,
+  UserController.pauseSong
+);
+
+routes.put("/previous",
+  AccessMiddleware.getRefreshedToken,
+  UserController.previousSong
+);
+
+routes.put("/next",
+  AccessMiddleware.getRefreshedToken,
+  UserController.nextSong
 );
 
 module.exports = routes;
