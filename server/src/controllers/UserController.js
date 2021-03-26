@@ -137,7 +137,7 @@ module.exports = {
         const progress = response.data.progress_ms;
 
         const rewindResponse = await api.put(
-          `http://api.spotify.com/v1/me/player/seek?position_ms=${progress - 5000 >= 0 ? progress - 5000 : 0}`,
+          `https://api.spotify.com/v1/me/player/seek?position_ms=${progress - 5000 >= 0 ? progress - 5000 : 0}`,
           {},
           {
             headers: {
@@ -177,7 +177,7 @@ module.exports = {
         const progress = response.data.progress_ms;
 
         const forwardResponse = await api.put(
-          `http://api.spotify.com/v1/me/player/seek?position_ms=${progress + 5000}`,
+          `https://api.spotify.com/v1/me/player/seek?position_ms=${progress + 5000}`,
           {},
           {
             headers: {

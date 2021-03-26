@@ -87,7 +87,7 @@ export default function Dashboard() {
     }
 
     handleInit();
-    setTimeout(() => setCounter((counter) => counter + 1), [5000]);
+    setTimeout(() => setCounter((counter) => counter + 1), [2000]);
   }, [counter]);
 
   async function handlePlay() {
@@ -187,11 +187,11 @@ export default function Dashboard() {
   return (
     <div className="container" id="dashboard-container">
       <div className="buttons-container">
-        <button className="previous-btn" onClick={handlePrevious}><FaBackward size={16} /></button>
-        <button className="rewind-btn" onClick={handleRewind}><FaStepBackward size={16} /></button>
+        <button className="previous-btn" onClick={handlePrevious}><FaStepBackward size={16} /></button>
+        <button className="rewind-btn" onClick={handleRewind}><FaBackward size={16} /></button>
         <button className="play-btn" onClick={handlePlay}>{isPaused ? <FaPlay size={16} /> : <FaPause size={16} />}</button>
-        <button className="forward-btn" onClick={handleForward}><FaStepForward size={16} /></button>
-        <button className="next-btn" onClick={handleNext}><FaForward size={16} /></button>
+        <button className="forward-btn" onClick={handleForward}><FaForward size={16} /></button>
+        <button className="next-btn" onClick={handleNext}><FaStepForward size={16} /></button>
       </div>
       <div className="content" id="dashboard-content">
         <h1>Spotify-Lyrics</h1>
