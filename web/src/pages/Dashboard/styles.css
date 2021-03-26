@@ -3,7 +3,7 @@
   justify-content: flex-start;
   align-items: center;
   padding-top: 50px;
-  padding-bottom: 50px;
+  padding-bottom: 70px;
 }
 
 #dashboard-content {
@@ -43,7 +43,7 @@
   bottom: 10px;
   display: flex;
   max-width: 400px;
-  width: 100%;
+  width: 97%;
   padding: 10px;
 
   background: #555;
@@ -61,4 +61,10 @@
 
 .buttons-container button:hover {
   cursor: pointer;
+}
+
+.alert {
+  text-align: center;
+  margin-top: 10px;
+  color: #444;
 }

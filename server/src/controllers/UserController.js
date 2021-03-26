@@ -1,4 +1,5 @@
 const api = require("axios");
+const access = require("../middlewares/access");
 
 module.exports = {
   async getUserInfo(req, res) {
@@ -106,12 +107,92 @@ module.exports = {
       const response = await api.post("https://api.spotify.com/v1/me/player/next",{}, {headers: {"Authorization": `Bearer ${access_token}`}});
 
       if(response.status === 204){
-        return res.status(206).json({refresh_token});
+        return res.status(206).json({ refresh_token });
       }
     } catch (error) {
       return res.status(400).json({message: "Não foi possível fazer a requisição no momento"});
     }
     
     return res.status(400).json({message: "Não foi possível fazer a requisição no momento"});
-  }
+  },
+
+  async rewindSong(req, res){
+    const { access_token, refresh_token } = res.locals;
+
+    try {
+      let response = await api.get(
+        "https://api.spotify.com/v1/me/player/currently-playing",
+        {
+          headers: {
+            Authorization: "Bearer " + access_token,
+          },
+        }
+      );
+
+      if (response.status === 204) {
+        return res.status(206).json({ refresh_token });
+      }
+
+      if (response.status === 200) {
+        const progress = response.data.progress_ms;
+
+        const rewindResponse = await api.put(
+          `http://api.spotify.com/v1/me/player/seek?position_ms=${progress - 5000 >= 0 ? progress - 5000 : 0}`,
+          {},
+          {
+            headers: {
+              Authorization: "Bearer " + access_token,
+            },
+          });
+      
+          if(rewindResponse.status === 204){
+            return res.status(206).json({refresh_token});
+          }
+      }
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ message: "Não foi possível fazer a requisição no momento" });
+    }
+  },
+
+  async forwardSong(req, res){
+    const { access_token, refresh_token } = res.locals;
+
+    try {
+      let response = await api.get(
+        "https://api.spotify.com/v1/me/player/currently-playing",
+        {
+          headers: {
+            Authorization: "Bearer " + access_token,
+          },
+        }
+      );
+
+      if (response.status === 204) {
+        return res.status(206).json({ refresh_token });
+      }
+
+      if (response.status === 200) {
+        const progress = response.data.progress_ms;
+
+        const forwardResponse = await api.put(
+          `http://api.spotify.com/v1/me/player/seek?position_ms=${progress + 5000}`,
+          {},
+          {
+            headers: {
+              Authorization: "Bearer " + access_token,
+            },
+          });
+      
+          if(forwardResponse.status === 204){
+            return res.status(206).json({ refresh_token });
+          }
+      }
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ message: "Não foi possível fazer a requisição no momento" });
+    }
+  },
 };

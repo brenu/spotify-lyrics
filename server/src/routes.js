@@ -54,4 +54,14 @@ routes.put("/next",
   UserController.nextSong
 );
 
+routes.put("/rewind",
+  AccessMiddleware.getRefreshedToken,
+  UserController.rewindSong
+);
+
+routes.put("/forward",
+  AccessMiddleware.getRefreshedToken,
+  UserController.forwardSong
+);
+
 module.exports = routes;

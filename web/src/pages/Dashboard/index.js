@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import {FaStepForward, FaStepBackward, FaForward, FaBackward, FaPlay, FaPause} from "react-icons/fa";
 import { useEffect } from "react";
 
 import api from "../../services/api";
@@ -124,15 +125,11 @@ export default function Dashboard() {
 
     try {
       let response;
-      
-      if(isPaused){
-        response = await api.put("/previous",{refresh_token});
-      }else{
-        response = await api.put("/pause",{refresh_token});
-      }
 
-      if(response.status === 204){
-        setIsPaused(isPaused => !isPaused);
+      response = await api.put("/previous",{refresh_token});
+
+      if(response.status === 206){
+        localStorage.setItem("refresh_token", response.data.refresh_token);
       }
     } catch (error) {
       console.log("Unable to make request");
@@ -145,14 +142,42 @@ export default function Dashboard() {
     try {
       let response;
       
-      if(isPaused){
-        response = await api.put("/next",{refresh_token});
-      }else{
-        response = await api.put("/pause",{refresh_token});
+      response = await api.put("/next",{refresh_token});
+
+      if(response.status === 206){
+        localStorage.setItem("refresh_token", response.data.refresh_token);
       }
+    } catch (error) {
+      console.log("Unable to make request");
+    }
+  }
+
+  async function handleRewind() {
+    const refresh_token = localStorage.getItem("refresh_token");
+
+    try {
+      let response;
+      
+      response = await api.put("/rewind",{refresh_token});
+
+      if(response.status === 206){
+        localStorage.setItem("refresh_token", response.data.refresh_token);
+      }
+    } catch (error) {
+      console.log("Unable to make request");
+    }
+  }
+
+  async function handleForward() {
+    const refresh_token = localStorage.getItem("refresh_token");
+
+    try {
+      let response;
+      
+      response = await api.put("/forward",{refresh_token});
 
       if(response.status === 204){
-        setIsPaused(isPaused => !isPaused);
+        localStorage.setItem("refresh_token", response.data.refresh_token);
       }
     } catch (error) {
       console.log("Unable to make request");
@@ -162,9 +187,11 @@ export default function Dashboard() {
   return (
     <div className="container" id="dashboard-container">
       <div className="buttons-container">
-        <button className="previous-btn" onClick={handlePrevious}>Previous</button>
-        <button className="play-btn" onClick={handlePlay}>{isPaused ? 'Play' : 'Pause'}</button>
-        <button className="next-btn" onClick={handleNext}>Next</button>
+        <button className="previous-btn" onClick={handlePrevious}><FaBackward size={16} /></button>
+        <button className="rewind-btn" onClick={handleRewind}><FaStepBackward size={16} /></button>
+        <button className="play-btn" onClick={handlePlay}>{isPaused ? <FaPlay size={16} /> : <FaPause size={16} />}</button>
+        <button className="forward-btn" onClick={handleForward}><FaStepForward size={16} /></button>
+        <button className="next-btn" onClick={handleNext}><FaForward size={16} /></button>
       </div>
       <div className="content" id="dashboard-content">
         <h1>Spotify-Lyrics</h1>
@@ -199,6 +226,7 @@ export default function Dashboard() {
         </div>
         <p className="reference">Lyrics by </p>
         <a href="https://lyrics.ovh/">lyrics.ovh</a>
+        <p className="alert">The player functions only work if you have a Spotify premium account</p>
       </div>
     </div>
   );
