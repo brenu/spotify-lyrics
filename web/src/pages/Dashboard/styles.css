@@ -3,7 +3,7 @@
   justify-content: flex-start;
   align-items: center;
   padding-top: 50px;
-  padding-bottom: 70px;
+  padding-bottom: 80px;
 }
 
 #dashboard-content {
@@ -37,18 +37,24 @@
   color: #fff;
 }
 
-.buttons-container {
+.player-container {
   position: fixed;
   z-index: 100;
   bottom: 10px;
   display: flex;
+  flex-direction: column;
   max-width: 400px;
   width: 97%;
   padding: 10px;
 
   background: #555;
   border-radius: 10px;
+}
 
+.buttons-container {
+  position: relative;
+  width: 100%;
+  display: flex;
   justify-content: space-evenly;
   align-items: center;
 }
@@ -63,8 +69,46 @@
   cursor: pointer;
 }
 
+#slider {
+  position: relative;
+  display: flex;
+  justify-content: flex-start;
+  align-items: stretch;
+  height: 10px;
+  width: 100%;
+  background: #333;
+  border-radius: 5px;
+  margin-bottom: 15px;
+}
+
+#past-slider {
+  position: relative;
+  height: 10px;
+  width: 15px;
+  background: #4bb543;
+  border-radius: 5px;
+
+  box-shadow: inset 2px 2px 1px rgba(0,0,0,0.2);
+}
+
+#thumb {
+  position: absolute;
+  height: 15px;
+  width: 15px;
+  border-radius: 50%;
+  background: #fff;
+  transition: 0.8s;
+
+  left: -2.5px;
+  top: -2.5px;
+}
+
+#thumb:hover {
+  cursor: pointer;
+}
+
 .alert {
   text-align: center;
-  margin-top: 10px;
+  margin-top: 15px;
   color: #444;
 }

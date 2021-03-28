@@ -16,6 +16,10 @@ export default function Dashboard() {
   const [songMessage, setSongMessage] = useState("");
   const [isPaused, setIsPaused] = useState(true);
 
+
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+
   const [counter, setCounter] = useState(0);
 
   useEffect(() => {
@@ -30,6 +34,8 @@ export default function Dashboard() {
           localStorage.setItem("refresh_token", response.data.refresh_token);
           if(response.data.is_playing != undefined){
             setIsPaused(isPaused => !response.data.is_playing);
+            setProgress(response.data.progress_ms);
+            setDuration(response.data.item.duration_ms);
           }
         } else {
           var response = await api.put("/get-song-refreshed", {
@@ -38,6 +44,8 @@ export default function Dashboard() {
           localStorage.setItem("refresh_token", response.data.refresh_token);
           if(response.data.is_playing != undefined){
             setIsPaused(isPaused => !response.data.is_playing);
+            setProgress(response.data.progress_ms);
+            setDuration(response.data.item.duration_ms);
           }
         }
 
@@ -89,6 +97,21 @@ export default function Dashboard() {
     handleInit();
     setTimeout(() => setCounter((counter) => counter + 1), [2000]);
   }, [counter]);
+
+  useEffect(() => {
+    const slider =  document.querySelector("#slider");
+    const thumb = slider.querySelector("#thumb");
+    const pastSlider = slider.querySelector("#past-slider");
+
+    const percentage = progress*100/duration;
+
+    if(percentage < 100){
+      thumb.style.left = `calc(${percentage.toFixed(1)}% - 8px)`;
+
+      pastSlider.style.width = `calc(${percentage.toFixed(1)}% - 2.5px)`;
+    }
+
+  }, [progress]);
 
   async function handlePlay() {
     const refresh_token = localStorage.getItem("refresh_token");
@@ -184,14 +207,58 @@ export default function Dashboard() {
     }
   }
 
+  async function handlePlaybackSeek(){
+    let slider = document.querySelector('#slider');
+    let thumb = slider.querySelector('#thumb');
+  }
+
+  async function handleThumbDrag(event){
+      let slider = document.querySelector("#slider");
+      let thumb = slider.querySelector('#thumb');
+
+      event.preventDefault();
+
+      let shiftX = event.clientX - thumb.getBoundingClientRect().left;
+
+      document.addEventListener('mousemove', onMouseMove);
+      document.addEventListener('mouseup', onMouseUp);
+
+      function onMouseMove(event) {
+        let newLeft = event.clientX - shiftX - slider.getBoundingClientRect().left;
+
+        if (newLeft < 0) {
+          newLeft = 0;
+        }
+        let rightEdge = slider.offsetWidth - thumb.offsetWidth;
+        if (newLeft > rightEdge) {
+          newLeft = rightEdge;
+        }
+
+        thumb.style.left = newLeft + 'px';
+      }
+
+      function onMouseUp() {
+        handlePlaybackSeek();
+
+        document.removeEventListener('mouseup', onMouseUp);
+        document.removeEventListener('mousemove', onMouseMove);
+      }
+  }
+
   return (
     <div className="container" id="dashboard-container">
-      <div className="buttons-container">
-        <button className="previous-btn" onClick={handlePrevious}><FaStepBackward size={16} /></button>
-        <button className="rewind-btn" onClick={handleRewind}><FaBackward size={16} /></button>
-        <button className="play-btn" onClick={handlePlay}>{isPaused ? <FaPlay size={16} /> : <FaPause size={16} />}</button>
-        <button className="forward-btn" onClick={handleForward}><FaForward size={16} /></button>
-        <button className="next-btn" onClick={handleNext}><FaStepForward size={16} /></button>
+      <div className="player-container">
+        <div id="slider">
+          <div id="past-slider"></div>
+          <div id="thumb" onMouseDown={handleThumbDrag} onDragStart={() => false}></div>
+        </div>
+        <div className="buttons-container">
+          <button className="previous-btn" onClick={handlePrevious}><FaStepBackward size={16} /></button>
+          <button className="rewind-btn" onClick={handleRewind}><FaBackward size={16} /></button>
+          <button className="play-btn" onClick={handlePlay}>{isPaused ? <FaPlay size={16} /> : <FaPause size={16} />}</button>
+          <button className="forward-btn" onClick={handleForward}><FaForward size={16} /></button>
+          <button className="next-btn" onClick={handleNext}><FaStepForward size={16} /></button>
+        </div>
       </div>
       <div className="content" id="dashboard-content">
         <h1>Spotify-Lyrics</h1>
