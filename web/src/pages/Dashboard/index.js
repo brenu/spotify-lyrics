@@ -16,7 +16,7 @@ export default function Dashboard() {
   const [songMessage, setSongMessage] = useState("");
   const [isPaused, setIsPaused] = useState(true);
 
-
+  const [isDragging, setIsDragging] = useState(false);
   const [progress, setProgress] = useState(0);
   const [duration, setDuration] = useState(0);
 
@@ -99,18 +99,19 @@ export default function Dashboard() {
   }, [counter]);
 
   useEffect(() => {
-    const slider =  document.querySelector("#slider");
-    const thumb = slider.querySelector("#thumb");
-    const pastSlider = slider.querySelector("#past-slider");
+    if(!isDragging){
+      const slider =  document.querySelector("#slider");
+      const thumb = slider.querySelector("#thumb");
+      const pastSlider = slider.querySelector("#past-slider");
 
-    const percentage = progress*100/duration;
+      const percentage = progress*100/duration;
 
-    if(percentage < 100){
-      thumb.style.left = `calc(${percentage.toFixed(1)}% - 8px)`;
+      if(percentage < 100){
+        thumb.style.left = `calc(${percentage.toFixed(1)}% - 8px)`;
 
-      pastSlider.style.width = `calc(${percentage.toFixed(1)}% - 2.5px)`;
+        pastSlider.style.width = `calc(${percentage.toFixed(1)}% - 2.5px)`;
+      }
     }
-
   }, [progress]);
 
   async function handlePlay() {
@@ -199,7 +200,7 @@ export default function Dashboard() {
       
       response = await api.put("/forward",{refresh_token});
 
-      if(response.status === 204){
+      if(response.status === 206){
         localStorage.setItem("refresh_token", response.data.refresh_token);
       }
     } catch (error) {
@@ -208,13 +209,33 @@ export default function Dashboard() {
   }
 
   async function handlePlaybackSeek(){
+    const refresh_token = localStorage.getItem("refresh_token");
+
     let slider = document.querySelector('#slider');
     let thumb = slider.querySelector('#thumb');
-  }
 
+    try {
+      const newProgress = (thumb.offsetLeft / slider.clientWidth * duration).toFixed(0);
+
+      const response = await api.put(`/seek/${newProgress}`,{refresh_token});
+
+      if(response.status === 206){
+        localStorage.setItem("refresh_token", response.data.refresh_token);
+        setProgress(newProgress);
+        setIsDragging(false);
+      }
+    } catch (error) {
+      console.log("Unable to make request");
+      setProgress(progress => progress);
+      setIsDragging(false);
+    }
+  }
+  
   async function handleThumbDrag(event){
+      setIsDragging(true);
       let slider = document.querySelector("#slider");
       let thumb = slider.querySelector('#thumb');
+      let pastSlider = slider.querySelector("#past-slider");
 
       event.preventDefault();
 
@@ -235,6 +256,7 @@ export default function Dashboard() {
         }
 
         thumb.style.left = newLeft + 'px';
+        pastSlider.style.width = newLeft + 5 + 'px';
       }
 
       function onMouseUp() {
@@ -245,12 +267,48 @@ export default function Dashboard() {
       }
   }
 
+  async function handleThumbMobileDrag(event){
+    setIsDragging(true);
+    let slider = document.querySelector("#slider");
+    let thumb = slider.querySelector('#thumb');
+    let pastSlider = slider.querySelector("#past-slider");
+    
+    event.preventDefault();
+    
+    let shiftX = event.touches[0].clientX - thumb.getBoundingClientRect().left;
+    
+    document.addEventListener('touchmove', onTouchMove);
+    document.addEventListener('touchend', onTouchEnd);
+    
+    function onTouchMove(event) {
+      let newLeft = event.touches[0].clientX - shiftX - slider.getBoundingClientRect().left;
+
+      if (newLeft < 0) {
+        newLeft = 0;
+      }
+      let rightEdge = slider.offsetWidth - thumb.offsetWidth;
+      if (newLeft > rightEdge) {
+        newLeft = rightEdge;
+      }
+      
+      thumb.style.left = newLeft + 'px';
+      pastSlider.style.width = newLeft + 5 + 'px';
+    }
+    
+    function onTouchEnd() {
+      handlePlaybackSeek();
+      
+      document.removeEventListener('touchend', onTouchEnd);
+      document.removeEventListener('touchmove', onTouchMove);
+    }
+  } 
+
   return (
     <div className="container" id="dashboard-container">
       <div className="player-container">
         <div id="slider">
           <div id="past-slider"></div>
-          <div id="thumb" onMouseDown={handleThumbDrag} onDragStart={() => false}></div>
+          <div id="thumb" onMouseDown={handleThumbDrag} onTouchStart={handleThumbMobileDrag} onDragStart={() => false}></div>
         </div>
         <div className="buttons-container">
           <button className="previous-btn" onClick={handlePrevious}><FaStepBackward size={16} /></button>

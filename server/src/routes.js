@@ -64,4 +64,9 @@ routes.put("/forward",
   UserController.forwardSong
 );
 
+routes.put("/seek/:progress",
+  AccessMiddleware.getRefreshedToken,
+  UserController.seekSong
+);
+
 module.exports = routes;

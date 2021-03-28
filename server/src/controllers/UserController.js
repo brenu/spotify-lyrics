@@ -195,4 +195,30 @@ module.exports = {
         .json({ message: "Não foi possível fazer a requisição no momento" });
     }
   },
+
+  async seekSong(req, res){
+    let { progress } = req.params;
+    const { access_token, refresh_token } = res.locals;
+
+    progress = progress.match(/\d+/g).join('');
+
+    try {
+        const seekResponse = await api.put(
+          `https://api.spotify.com/v1/me/player/seek?position_ms=${progress}`,
+          {},
+          {
+            headers: {
+              Authorization: "Bearer " + access_token,
+            },
+          });
+      
+          if(seekResponse.status === 204){
+            return res.status(206).json({ refresh_token });
+          }
+    } catch (error) {
+      return res
+        .status(400)
+        .json({ message: "Não foi possível fazer a requisição no momento" });
+    }
+  },
 };
