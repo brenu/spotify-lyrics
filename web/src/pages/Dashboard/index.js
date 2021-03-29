@@ -226,7 +226,7 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.log("Unable to make request");
-      setProgress(progress => progress);
+      setProgress(progress => progress + 1);
       setIsDragging(false);
     }
   }
